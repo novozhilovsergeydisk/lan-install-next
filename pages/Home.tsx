@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, Network, Zap, HardDrive, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Network, Zap, HardDrive, ArrowRight, CircleCheck } from 'lucide-react';
 
 const Home: React.FC = () => {
   // State for background slideshow
@@ -23,39 +23,6 @@ const Home: React.FC = () => {
 
     return () => clearInterval(interval);
   }, [heroImages.length]);
-
-  const benefits = [
-    "Гарантия на работы 2 года",
-    "Опытные монтажники",
-    "Бесплатный выезд и смета"
-  ];
-
-  const services = [
-    {
-      icon: <Network size={48} />,
-      title: "Монтаж СКС",
-      desc: "Надежная кабельная инфраструктура. Прокладка кабеля, сборка и коммутация серверных шкафов.",
-      link: "/calculator#SCS"
-    },
-    {
-      icon: <ShieldCheck size={48} />,
-      title: "Видеонаблюдение",
-      desc: "IP и аналоговые системы под ключ. Удаленный доступа, настройка регистраторов.",
-      link: "/calculator#Video"
-    },
-    {
-      icon: <Zap size={48} />,
-      title: "Оптоволокно (ВОЛС)",
-      desc: "Прокладка и сварка оптоволоконных линий. Тестирование рефлектометром.",
-      link: "/calculator#Fiber"
-    },
-    {
-      icon: <HardDrive size={48} />,
-      title: "Контроль доступа",
-      desc: "Турникеты, электронные замки, домофония и учет рабочего времени.",
-      link: "/calculator#Access"
-    }
-  ];
 
   return (
     <div>
@@ -88,12 +55,18 @@ const Home: React.FC = () => {
           </p>
           
           <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-8 mb-10">
-            {benefits.map((benefit, index) => (
-              <div key={index} className="flex items-center justify-center gap-2 text-green-400 font-medium">
-                <CheckCircle2 size={20} />
-                <span>{benefit}</span>
+              <div className="flex items-center justify-center gap-2 text-green-400 font-medium">
+                <CircleCheck size={20} />
+                <span>Гарантия на работы 2 года</span>
               </div>
-            ))}
+              <div className="flex items-center justify-center gap-2 text-green-400 font-medium">
+                <CircleCheck size={20} />
+                <span>Опытные монтажники</span>
+              </div>
+              <div className="flex items-center justify-center gap-2 text-green-400 font-medium">
+                <CircleCheck size={20} />
+                <span>Бесплатный выезд и смета</span>
+              </div>
           </div>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -116,20 +89,57 @@ const Home: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {services.map((item, index) => (
-              <div key={index} className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-2 group">
+              <div className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-2 group">
                 <div className="text-lanGreen mb-6 group-hover:scale-110 transition-transform duration-300">
-                  {item.icon}
+                  <Network size={48} />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-3">{item.title}</h3>
+                <h3 className="text-xl font-bold text-gray-800 mb-3">Монтаж СКС</h3>
                 <p className="text-gray-600 mb-6 leading-relaxed">
-                  {item.desc}
+                  Надежная кабельная инфраструктура. Прокладка кабеля, сборка и коммутация серверных шкафов.
                 </p>
-                <Link to={item.link} className="inline-flex items-center text-lanBlue font-semibold hover:text-lanGreen transition">
+                <Link to="/calculator#SCS" className="inline-flex items-center text-lanBlue font-semibold hover:text-lanGreen transition">
                   Рассчитать стоимость <ArrowRight size={16} className="ml-2" />
                 </Link>
               </div>
-            ))}
+
+              <div className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-2 group">
+                <div className="text-lanGreen mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <ShieldCheck size={48} />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-3">Видеонаблюдение</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  IP и аналоговые системы под ключ. Удаленный доступа, настройка регистраторов.
+                </p>
+                <Link to="/calculator#Video" className="inline-flex items-center text-lanBlue font-semibold hover:text-lanGreen transition">
+                  Рассчитать стоимость <ArrowRight size={16} className="ml-2" />
+                </Link>
+              </div>
+
+              <div className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-2 group">
+                <div className="text-lanGreen mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Zap size={48} />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-3">Оптоволокно (ВОЛС)</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Прокладка и сварка оптоволоконных линий. Тестирование рефлектометром.
+                </p>
+                <Link to="/calculator#Fiber" className="inline-flex items-center text-lanBlue font-semibold hover:text-lanGreen transition">
+                  Рассчитать стоимость <ArrowRight size={16} className="ml-2" />
+                </Link>
+              </div>
+
+              <div className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-2 group">
+                <div className="text-lanGreen mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <HardDrive size={48} />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-3">Контроль доступа</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Турникеты, электронные замки, домофония и учет рабочего времени.
+                </p>
+                <Link to="/calculator#Access" className="inline-flex items-center text-lanBlue font-semibold hover:text-lanGreen transition">
+                  Рассчитать стоимость <ArrowRight size={16} className="ml-2" />
+                </Link>
+              </div>
           </div>
         </div>
       </section>
