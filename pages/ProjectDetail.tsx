@@ -18,20 +18,20 @@ const ProjectDetail: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header Image */}
-      <div className="h-[40vh] w-full relative overflow-hidden bg-gray-900">
+      <div className="h-[45vh] w-full relative overflow-hidden bg-lanBlue group">
         <img 
           src={project.mainImage} 
           alt={project.title} 
-          className="w-full h-full object-cover opacity-60"
+          className="w-full h-full object-cover opacity-60 transition-transform duration-[1200ms] ease-[cubic-bezier(0.4,0,0.2,1)] transform group-hover:scale-105 group-hover:duration-[1200ms]"
         />
-        <div className="absolute inset-0 flex flex-col justify-end pb-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-           <Link to="/portfolio" className="text-white/80 hover:text-white flex items-center gap-2 mb-6 transition w-fit">
-              <ArrowLeft size={20} /> Назад в портфолио
+        <div className="absolute inset-0 flex flex-col justify-end pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+           <Link to="/portfolio" className="text-white/80 hover:text-white flex items-center gap-2 mb-6 transition w-fit bg-black/20 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-black/40">
+              <ArrowLeft size={18} /> Назад в портфолио
            </Link>
-           <div className="inline-block bg-lanGreen text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3 w-fit">
+           <div className="inline-block bg-lanGreen text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 w-fit shadow-lg">
               {project.category === 'SCS' ? 'СКС' : project.category === 'Video' ? 'Видеонаблюдение' : project.category === 'Fiber' ? 'ВОЛС' : 'СКУД'}
            </div>
-           <h1 className="text-3xl md:text-5xl font-bold text-white">{project.title}</h1>
+           <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight shadow-black drop-shadow-md">{project.title}</h1>
         </div>
       </div>
 
