@@ -80,7 +80,7 @@ const Footer: React.FC = () => {
 
         {/* Copyright Section */}
         <div className="border-t border-gray-800 pt-8 mt-8 text-center">
-          <p className="text-xs text-gray-600">© {new Date().getFullYear()}, Lan-install. Все права защищены.</p>
+          <p className="text-xs text-gray-400">© {new Date().getFullYear()}, Lan-install. Все права защищены.</p>
         </div>
       </div>
     </footer>
