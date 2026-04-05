@@ -1,11 +1,12 @@
-
+"use client";
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, X, Phone } from 'lucide-react';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
+  const pathname = usePathname();
 
   const navLinks = [
     { name: 'Главная', path: '/' },
@@ -14,7 +15,7 @@ const Header: React.FC = () => {
     { name: 'Контакты', path: '/contact' },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => pathname === path;
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -22,7 +23,7 @@ const Header: React.FC = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
-            <Link to="/" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
                 <img src="/logo.png" alt="Lan-install Логотип" className="h-10 w-auto object-contain" />
             </Link>
           </div>
@@ -32,7 +33,7 @@ const Header: React.FC = () => {
             {navLinks.map((link) => (
               <Link
                 key={link.name}
-                to={link.path}
+                href={link.path}
                 className={`text-base font-medium transition-colors duration-200 ${
                   isActive(link.path)
                     ? 'text-lanGreen border-b-2 border-lanGreen'
@@ -91,7 +92,7 @@ const Header: React.FC = () => {
             {navLinks.map((link) => (
               <Link
                 key={link.name}
-                to={link.path}
+                href={link.path}
                 className={`block px-4 py-3 rounded-lg text-base font-medium border-b border-gray-50 last:border-0 ${
                     isActive(link.path) 
                     ? 'text-lanGreen bg-green-50' 

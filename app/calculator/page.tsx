@@ -1,7 +1,8 @@
 
+"use client";
 import React, { useState, useMemo, useEffect } from 'react';
-import { useLocation, Link } from 'react-router-dom';
-import { CalculatorItem } from '../types';
+import Link from 'next/link';
+import { CalculatorItem } from '../../types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { Save, RefreshCw, AlertTriangle, FileSpreadsheet } from 'lucide-react';
 
@@ -66,7 +67,11 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 const Calculator: React.FC = () => {
   const [items, setItems] = useState<CalculatorItem[]>(initialItems);
-  const { hash } = useLocation();
+  const [hash, setHash] = useState('');
+
+  useEffect(() => {
+    setHash(window.location.hash);
+  }, []);
 
   useEffect(() => {
     if (hash) {
@@ -283,7 +288,7 @@ const Calculator: React.FC = () => {
                 )}
 
                 <div className="space-y-3">
-                    <Link to="/contact" className="w-full bg-lanGreen hover:bg-green-600 text-white font-bold py-3 rounded-lg transition flex items-center justify-center gap-2">
+                    <Link href="/contact" className="w-full bg-lanGreen hover:bg-green-600 text-white font-bold py-3 rounded-lg transition flex items-center justify-center gap-2">
                         <Save size={18} /> Отправить заявку
                     </Link>
                     

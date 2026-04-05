@@ -1,8 +1,9 @@
 
+"use client";
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { projects } from '../src/data/projects';
+import { projects } from '../../src/data/projects';
 
 const Portfolio: React.FC = () => {
   const [filter, setFilter] = useState<'All' | 'SCS' | 'Video' | 'Fiber' | 'Access'>('All');
@@ -48,7 +49,7 @@ const Portfolio: React.FC = () => {
         {filteredProjects.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredProjects.map(project => (
-                    <Link to={`/portfolio/${project.id}`} key={project.id} className="group relative bg-gray-50 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full">
+                    <Link href={`/portfolio/${project.id}`} key={project.id} className="group relative bg-gray-50 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full">
                         <div className="h-56 overflow-hidden relative">
                             <img 
                                 src={project.mainImage} 

@@ -1,6 +1,6 @@
-
+"use client";
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { ShieldCheck, Network, Zap, HardDrive, ArrowRight, CircleCheck } from 'lucide-react';
 
 const Home: React.FC = () => {
@@ -70,10 +70,10 @@ const Home: React.FC = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link to="/contact" className="bg-lanGreen hover:bg-green-500 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all duration-300 hover:shadow-[0_8px_30px_rgb(34,197,94,0.3)] border border-transparent">
+            <Link href="/contact" className="bg-lanGreen hover:bg-green-500 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all duration-300 hover:shadow-[0_8px_30px_rgb(34,197,94,0.3)] border border-transparent">
               Оставить заявку
             </Link>
-             <Link to="/portfolio" className="bg-transparent hover:bg-white/10 text-white border-2 border-white/50 hover:border-white px-8 py-4 rounded-lg font-bold text-lg transition-all duration-300">
+             <Link href="/portfolio" className="bg-transparent hover:bg-white/10 text-white border-2 border-white/50 hover:border-white px-8 py-4 rounded-lg font-bold text-lg transition-all duration-300">
               Примеры работ
             </Link>
           </div>
@@ -97,7 +97,7 @@ const Home: React.FC = () => {
                 <p className="text-gray-600 mb-6 leading-relaxed">
                   Надежная кабельная инфраструктура. Прокладка кабеля, сборка и коммутация серверных шкафов.
                 </p>
-                <Link to="/calculator#SCS" className="inline-flex items-center text-lanBlue font-semibold hover:text-lanGreen transition">
+                <Link href="/calculator#SCS" className="inline-flex items-center text-lanBlue font-semibold hover:text-lanGreen transition">
                   Рассчитать стоимость <ArrowRight size={16} className="ml-2" />
                 </Link>
               </div>
@@ -110,7 +110,7 @@ const Home: React.FC = () => {
                 <p className="text-gray-600 mb-6 leading-relaxed">
                   IP и аналоговые системы под ключ. Удаленный доступа, настройка регистраторов.
                 </p>
-                <Link to="/calculator#Video" className="inline-flex items-center text-lanBlue font-semibold hover:text-lanGreen transition">
+                <Link href="/calculator#Video" className="inline-flex items-center text-lanBlue font-semibold hover:text-lanGreen transition">
                   Рассчитать стоимость <ArrowRight size={16} className="ml-2" />
                 </Link>
               </div>
@@ -123,7 +123,7 @@ const Home: React.FC = () => {
                 <p className="text-gray-600 mb-6 leading-relaxed">
                   Прокладка и сварка оптоволоконных линий. Тестирование рефлектометром.
                 </p>
-                <Link to="/calculator#Fiber" className="inline-flex items-center text-lanBlue font-semibold hover:text-lanGreen transition">
+                <Link href="/calculator#Fiber" className="inline-flex items-center text-lanBlue font-semibold hover:text-lanGreen transition">
                   Рассчитать стоимость <ArrowRight size={16} className="ml-2" />
                 </Link>
               </div>
@@ -136,7 +136,7 @@ const Home: React.FC = () => {
                 <p className="text-gray-600 mb-6 leading-relaxed">
                   Турникеты, электронные замки, домофония и учет рабочего времени.
                 </p>
-                <Link to="/calculator#Access" className="inline-flex items-center text-lanBlue font-semibold hover:text-lanGreen transition">
+                <Link href="/calculator#Access" className="inline-flex items-center text-lanBlue font-semibold hover:text-lanGreen transition">
                   Рассчитать стоимость <ArrowRight size={16} className="ml-2" />
                 </Link>
               </div>

@@ -1,18 +1,24 @@
-
+"use client";
 import React from 'react';
-import { useParams, Link, Navigate } from 'react-router-dom';
+import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { ArrowLeft, MapPin, Calendar, User, CheckCircle2 } from 'lucide-react';
-import { projects } from '../src/data/projects';
+import { projects } from '../../../src/data/projects';
 
 const ProjectDetail: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams<{ id: string }>();
+  const id = params?.id;
+  const router = useRouter();
   
   // Находим проект по ID
   const project = projects.find(p => p.id === Number(id));
 
   // Если проект не найден, редирект или ошибка
   if (!project) {
-    return <Navigate to="/portfolio" />;
+    if (typeof window !== 'undefined') {
+      router.push('/portfolio');
+    }
+    return null;
   }
 
   return (
@@ -25,7 +31,7 @@ const ProjectDetail: React.FC = () => {
           className="w-full h-full object-cover opacity-60 transition-transform duration-[1200ms] ease-[cubic-bezier(0.4,0,0.2,1)] transform group-hover:scale-105 group-hover:duration-[1200ms]"
         />
         <div className="absolute inset-0 flex flex-col justify-end pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-           <Link to="/portfolio" className="text-white/80 hover:text-white flex items-center gap-2 mb-6 transition w-fit bg-black/20 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-black/40">
+           <Link href="/portfolio" className="text-white/80 hover:text-white flex items-center gap-2 mb-6 transition w-fit bg-black/20 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-black/40">
               <ArrowLeft size={18} /> Назад в портфолио
            </Link>
            <div className="inline-block bg-lanGreen text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 w-fit shadow-lg">
@@ -117,7 +123,7 @@ const ProjectDetail: React.FC = () => {
 
                 <div className="mt-8 pt-6 border-t border-gray-100">
                     <Link 
-                        to="/contact" 
+                        href="/contact" 
                         className="block w-full bg-lanBlue hover:bg-blue-900 text-white text-center font-bold py-3 rounded-lg transition"
                     >
                         Хочу так же

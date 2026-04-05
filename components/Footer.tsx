@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { MapPin, Phone, Mail } from 'lucide-react';
 
 const Footer: React.FC = () => {
@@ -70,10 +70,10 @@ const Footer: React.FC = () => {
           <div className="text-center md:text-left">
              <h3 className="text-white text-lg font-bold mb-6">Услуги</h3>
              <ul className="space-y-3 text-sm">
-                <li><Link to="/calculator#SCS" className="hover:text-lanGreen transition block py-1">Монтаж СКС</Link></li>
-                <li><Link to="/calculator#Video" className="hover:text-lanGreen transition block py-1">Видеонаблюдение</Link></li>
-                <li><Link to="/calculator#Fiber" className="hover:text-lanGreen transition block py-1">Сварка оптоволокна</Link></li>
-                <li><Link to="/calculator#Access" className="hover:text-lanGreen transition block py-1">СКУД</Link></li>
+                <li><Link href="/calculator#SCS" className="hover:text-lanGreen transition block py-1">Монтаж СКС</Link></li>
+                <li><Link href="/calculator#Video" className="hover:text-lanGreen transition block py-1">Видеонаблюдение</Link></li>
+                <li><Link href="/calculator#Fiber" className="hover:text-lanGreen transition block py-1">Сварка оптоволокна</Link></li>
+                <li><Link href="/calculator#Access" className="hover:text-lanGreen transition block py-1">СКУД</Link></li>
              </ul>
           </div>
         </div>

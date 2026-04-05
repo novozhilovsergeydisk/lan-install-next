@@ -1,7 +1,8 @@
 
+"use client";
 import React, { useState, useEffect } from 'react';
 import { Mail, Phone, CheckCircle, AlertCircle, Settings, Paperclip, X, FileText } from 'lucide-react';
-import config from '../src/config';
+import config from '../../src/config';
 
 const Contact: React.FC = () => {
   const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error' | 'config_error'>('idle');
