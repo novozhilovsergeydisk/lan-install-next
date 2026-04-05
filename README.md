@@ -1,20 +1,68 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Lan-install - Интерактивный интерфейс
 
-# Run and deploy your AI Studio app
+Современный веб-интерфейс для компании «lan-install.ru», специализирующейся на проектировании и монтаже слаботочных систем (СКС, видеонаблюдение, СКУД, ВОЛС).
 
-This contains everything you need to run your app locally.
+Сайт представляет собой высокопроизводительное приложение на базе **Next.js**, оптимизированное для поисковых систем (SEO) и удобства пользователей.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1mNupcMOrKJ7_Gih3VoqrD-R6QHShX7xw
+## 🚀 Стек технологий
 
-## Run Locally
+- **Framework**: [Next.js 15 (App Router)](https://nextjs.org/)
+- **Язык**: [TypeScript](https://www.typescriptlang.org/)
+- **Стилизация**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Иконки**: [Lucide React](https://lucide.dev/)
+- **Графики**: [Recharts](https://recharts.org/) (для калькулятора)
 
-**Prerequisites:**  Node.js
+## ✨ Основные возможности
 
+- **Интерактивный калькулятор**: Расчет стоимости услуг в реальном времени с возможностью экспорта сметы.
+- **Портфолио**: Каталог выполненных проектов с детальными фотоотчетами и фильтрацией по категориям.
+- **Умная форма заявок**: Интеграция с Telegram Bot API для мгновенных уведомлений о новых заказах.
+- **Безопасность**: Защита персональных данных (152-ФЗ) и безопасная обработка API-ключей.
+- **SEO-оптимизация**: Серверный рендеринг (SSG/SSR) для идеальной индексации поисковиками.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 🛠 Запуск проекта
+
+### Предварительные требования
+
+Убедитесь, что у вас установлен [Node.js](https://nodejs.org/) (рекомендуемая версия 18 или выше).
+
+### Установка
+
+1. Клонируйте репозиторий:
+   ```bash
+   git clone https://github.com/novozhilovsergeydisk/lan-install-next.git
+   cd lan-install-next
+   ```
+
+2. Установите зависимости:
+   ```bash
+   npm install
+   ```
+
+3. Настройте переменные окружения. Создайте файл `.env.local` в корне проекта и добавьте ключи Telegram:
+   ```env
+   TG_BOT_TOKEN=ваш_токен_бота
+   TG_CHAT_ID=ваш_id_чата
+   ```
+
+4. Запустите сервер для разработки:
+   ```bash
+   npm run dev
+   ```
+
+Сайт будет доступен по адресу [http://localhost:3000](http://localhost:3000).
+
+## 🏗 Сборка для продакшена
+
+Для создания оптимизированной сборки выполните:
+```bash
+npm run build
+```
+Запуск собранного приложения:
+```bash
+npm run start
+```
+
+## 📝 Лицензия
+
+Этот проект является частной собственностью компании ООО «Лан-Инсталл». Все права защищены.
