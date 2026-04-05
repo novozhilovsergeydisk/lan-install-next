@@ -159,6 +159,9 @@ const Contact: React.FC = () => {
         <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 border border-gray-100">
             <form onSubmit={handleSubmit} className="space-y-8" noValidate>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Honey Pot (Spam Protection) */}
+                    <input type="text" name="website" className="hidden" tabIndex={-1} autoComplete="off" />
+                    
                     <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">Ваше имя</label>
                         <input 

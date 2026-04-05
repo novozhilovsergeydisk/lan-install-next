@@ -15,6 +15,7 @@ dist-ssr
 .env*
 .next/
 out/
+spam_logs.txt
 
 # Editor directories and files
 .vscode/*

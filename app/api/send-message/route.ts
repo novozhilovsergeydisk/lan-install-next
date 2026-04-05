@@ -1,6 +1,8 @@
 
 import { NextResponse } from 'next/server';
 import config from '../../../src/config';
+import fs from 'fs/promises';
+import path from 'path';
 
 export async function POST(request: Request) {
   try {
@@ -9,6 +11,23 @@ export async function POST(request: Request) {
     const phone = formData.get('phone');
     const message = formData.get('message');
     const files = formData.getAll('files') as File[];
+    
+    // Honey Pot protection
+    const honeypot = formData.get('website');
+    if (honeypot) {
+      // Логируем попытку спама в файл
+      const logEntry = `[${new Date().toISOString()}] SPAM DETECTED\nName: ${name}\nPhone: ${phone}\nMessage: ${message}\nHoneypot Content: ${honeypot}\n-------------------\n`;
+      
+      try {
+        const logPath = path.join(process.cwd(), 'spam_logs.txt');
+        await fs.appendFile(logPath, logEntry);
+      } catch (logError) {
+        console.error('Failed to write to spam_logs.txt:', logError);
+      }
+
+      console.log('Spam detected via Honey Pot');
+      return NextResponse.json({ success: true, message: 'Spam filtered' });
+    }
 
     const { TG_BOT_TOKEN, TG_CHAT_ID } = config;
 
