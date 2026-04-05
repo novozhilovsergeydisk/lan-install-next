@@ -89,7 +89,7 @@ const Home: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <div className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-2 group">
+              <div className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 border border-gray-100 hover:-translate-y-1 group">
                 <div className="text-lanGreen mb-6">
                   <Network size={48} />
                 </div>
@@ -102,7 +102,7 @@ const Home: React.FC = () => {
                 </Link>
               </div>
 
-              <div className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-2 group">
+              <div className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 border border-gray-100 hover:-translate-y-1 group">
                 <div className="text-lanGreen mb-6">
                   <ShieldCheck size={48} />
                 </div>
@@ -115,7 +115,7 @@ const Home: React.FC = () => {
                 </Link>
               </div>
 
-              <div className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-2 group">
+              <div className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 border border-gray-100 hover:-translate-y-1 group">
                 <div className="text-lanGreen mb-6">
                   <Zap size={48} />
                 </div>
@@ -128,7 +128,7 @@ const Home: React.FC = () => {
                 </Link>
               </div>
 
-              <div className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-2 group">
+              <div className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 border border-gray-100 hover:-translate-y-1 group">
                 <div className="text-lanGreen mb-6">
                   <HardDrive size={48} />
                 </div>
