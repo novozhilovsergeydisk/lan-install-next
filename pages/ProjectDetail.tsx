@@ -70,7 +70,7 @@ const ProjectDetail: React.FC = () => {
                             <img 
                                 src={img} 
                                 alt={`${project.title} фото ${index + 1}`} 
-                                className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                                className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out"
                             />
                         </div>
                     ))}
