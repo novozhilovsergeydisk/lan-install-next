@@ -194,14 +194,14 @@ const ProjectDetail: React.FC = () => {
           {/* Navigation Buttons */}
           <button 
             onClick={handlePrev}
-            className="absolute left-4 md:left-10 text-white/50 hover:text-white transition-all p-4 z-[110] hover:bg-white/5 rounded-full"
+            className="absolute left-4 md:left-10 text-white/50 hover:text-white transition-all p-2 z-[110]"
           >
             <ChevronLeft size={48} />
           </button>
           
           <button 
             onClick={handleNext}
-            className="absolute right-4 md:right-10 text-white/50 hover:text-white transition-all p-4 z-[110] hover:bg-white/5 rounded-full"
+            className="absolute right-4 md:right-10 text-white/50 hover:text-white transition-all p-2 z-[110]"
           >
             <ChevronRight size={48} />
           </button>
