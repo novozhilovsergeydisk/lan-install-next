@@ -167,7 +167,7 @@ const Home: React.FC = () => {
                  {step: 5, title: 'Сдача', desc: 'Настройка, тестирование и обучение'}
              ].map((item) => (
                  <div key={item.step} className="relative z-10 flex flex-col items-center text-center group">
-                     <div className="w-16 h-16 rounded-full bg-white border-4 border-lanGreen text-lanBlue flex items-center justify-center font-bold text-2xl mb-6 shadow-sm group-hover:bg-lanGreen group-hover:text-white group-hover:scale-110 transition-all duration-300">
+                     <div className="w-16 h-16 rounded-full bg-white border-4 border-lanGreen text-lanBlue flex items-center justify-center font-bold text-2xl mb-6 shadow-sm group-hover:bg-lanGreen group-hover:text-white group-hover:shadow-[0_8px_20px_rgb(34,197,94,0.4)] group-hover:-translate-y-1 transition-all duration-500">
                          {item.step}
                      </div>
                      <h3 className="text-lg font-bold text-gray-800 mb-3">{item.title}</h3>
