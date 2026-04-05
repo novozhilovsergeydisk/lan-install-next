@@ -1,11 +1,11 @@
 
 "use client";
-import React, { useState, useEffect, useCallback } from 'react';
-import { Mail, Phone, CheckCircle, AlertCircle, Settings, Paperclip, X, FileText, Loader2 } from 'lucide-react';
-import config from '../../src/config';
+import React, { useState, useEffect } from 'react';
+import { Mail, Phone, CheckCircle, AlertCircle, Paperclip, X, FileText, Loader2 } from 'lucide-react';
+import LegalModal from '../../components/LegalModal';
 
 const Contact: React.FC = () => {
-  const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error' | 'config_error'>('idle');
+  const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [uploadProgress, setUploadProgress] = useState<string>('');
   
@@ -15,20 +15,27 @@ const Contact: React.FC = () => {
     message: ''
   });
 
+  const [errors, setErrors] = useState({
+    name: false,
+    phone: false
+  });
+
   const [files, setFiles] = useState<File[]>([]);
-
-  // Используем настройки из config.ts
-  const { TG_BOT_TOKEN, TG_CHAT_ID } = config;
-
-  useEffect(() => {
-    if (!TG_BOT_TOKEN || !TG_CHAT_ID) {
-        console.warn("Missing Telegram keys in config");
-    }
-  }, [TG_BOT_TOKEN, TG_CHAT_ID]);
+  
+  // Legal states
+  const [agreedPrivacy, setAgreedPrivacy] = useState(false);
+  const [agreedData, setAgreedData] = useState(false);
+  const [legalModal, setLegalModal] = useState<{ isOpen: boolean; type: 'privacy' | 'consent' }>({
+    isOpen: false,
+    type: 'privacy'
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (errors[name as keyof typeof errors]) {
+      setErrors(prev => ({ ...prev, [name]: false }));
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,84 +49,55 @@ const Contact: React.FC = () => {
     setFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Генерация URL для Telegram
-  const getApiUrl = useCallback((method: string) => {
-      return `https://api.telegram.org/bot${TG_BOT_TOKEN}/${method}`;
-  }, [TG_BOT_TOKEN]);
+  const openLegal = (type: 'privacy' | 'consent') => {
+    setLegalModal({ isOpen: true, type });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Custom Validation
+    const newErrors = {
+      name: !formData.name.trim(),
+      phone: !formData.phone.trim()
+    };
+    
+    setErrors(newErrors);
+
+    if (newErrors.name || newErrors.phone) return;
+    if (!agreedPrivacy || !agreedData) return;
+
     setFormStatus('submitting');
     setErrorMessage('');
     setUploadProgress('');
 
-    if (!TG_BOT_TOKEN || !TG_CHAT_ID) {
-      setFormStatus('config_error');
-      return;
-    }
-
-    // Простая валидация ID
-    const chatIdPattern = /^-?\d+$/;
-    if (!chatIdPattern.test(TG_CHAT_ID)) {
-       setFormStatus('error');
-       setErrorMessage(`Некорректный формат Chat ID в конфиге.`);
-       return;
-    }
-
-    const text = `
-🔔 <b>Новая заявка с сайта!</b>
-
-👤 <b>Имя:</b> ${formData.name}
-📞 <b>Телефон:</b> ${formData.phone}
-📝 <b>Задача:</b> ${formData.message || 'Не указано'}
-📎 <b>Файлов прикреплено:</b> ${files.length}
-    `;
-
     try {
-      // 1. Отправляем текст
-      const textUrl = getApiUrl('sendMessage');
-      
-      const response = await fetch(textUrl, {
+      const apiFormData = new FormData();
+      apiFormData.append('name', formData.name);
+      apiFormData.append('phone', formData.phone);
+      apiFormData.append('message', formData.message);
+      files.forEach(file => apiFormData.append('files', file));
+
+      const response = await fetch('/api/send-message', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: TG_CHAT_ID,
-          text: text,
-          parse_mode: 'HTML',
-        }),
+        body: apiFormData,
       });
 
-      if (!response.ok) {
-         const errText = await response.text();
-         throw new Error(`Telegram Error: ${response.status}`);
-      }
+      const result = await response.json();
 
-      // 2. Отправка файлов
-      if (files.length > 0) {
-         const docUrl = getApiUrl('sendDocument');
-         
-         for (let i = 0; i < files.length; i++) {
-             setUploadProgress(`Загрузка: ${i + 1}/${files.length}`);
-             
-             const formDataFile = new FormData();
-             formDataFile.append('chat_id', TG_CHAT_ID);
-             formDataFile.append('document', files[i]);
-             
-             await fetch(docUrl, {
-                 method: 'POST',
-                 body: formDataFile
-             });
-         }
+      if (!response.ok) {
+        throw new Error(result.error || 'Ошибка при отправке');
       }
 
       setFormStatus('success');
       setFormData({ name: '', phone: '', message: '' });
       setFiles([]);
-      setUploadProgress('');
+      setAgreedPrivacy(false);
+      setAgreedData(false);
 
     } catch (error: any) {
       console.error('Submission Error:', error);
-      setErrorMessage(error.message || 'Ошибка сети');
+      setErrorMessage(error.message || 'Не удалось отправить заявку. Пожалуйста, попробуйте позже.');
       setFormStatus('error');
     }
   };
@@ -145,7 +123,7 @@ const Contact: React.FC = () => {
     <div className="py-16 bg-gray-50 min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
-        {/* Top Info Block (Horizontal) */}
+        {/* Top Info Block */}
         <div className="bg-lanBlue rounded-2xl shadow-lg p-8 md:p-12 text-white overflow-hidden relative">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
             <div className="relative z-10">
@@ -179,7 +157,7 @@ const Contact: React.FC = () => {
 
         {/* Bottom Form Block */}
         <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 border border-gray-100">
-            <form onSubmit={handleSubmit} className="space-y-8">
+            <form onSubmit={handleSubmit} className="space-y-8" noValidate>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">Ваше имя</label>
@@ -188,10 +166,12 @@ const Contact: React.FC = () => {
                             name="name"
                             value={formData.name}
                             onChange={handleChange}
-                            required 
-                            className="w-full px-4 py-4 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-lanGreen focus:border-transparent outline-none transition-all" 
+                            className={`w-full px-4 py-4 rounded-xl bg-gray-50 border focus:bg-white focus:ring-2 outline-none transition-all ${
+                                errors.name ? 'border-red-500 focus:ring-red-200' : 'border-gray-200 focus:ring-lanGreen focus:border-transparent'
+                            }`} 
                             placeholder="Как к вам обращаться?" 
                         />
+                        {errors.name && <p className="text-red-500 text-xs mt-1 font-medium">Пожалуйста, введите ваше имя</p>}
                     </div>
                     <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">Контактный телефон</label>
@@ -200,10 +180,12 @@ const Contact: React.FC = () => {
                             name="phone"
                             value={formData.phone}
                             onChange={handleChange}
-                            required 
-                            className="w-full px-4 py-4 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-lanGreen focus:border-transparent outline-none transition-all" 
+                            className={`w-full px-4 py-4 rounded-xl bg-gray-50 border focus:bg-white focus:ring-2 outline-none transition-all ${
+                                errors.phone ? 'border-red-500 focus:ring-red-200' : 'border-gray-200 focus:ring-lanGreen focus:border-transparent'
+                            }`} 
                             placeholder="+7 (___) ___-__-__" 
                         />
+                        {errors.phone && <p className="text-red-500 text-xs mt-1 font-medium">Пожалуйста, введите номер телефона</p>}
                     </div>
                 </div>
 
@@ -262,11 +244,37 @@ const Contact: React.FC = () => {
                     )}
                 </div>
 
-                <div className="pt-4 border-t border-gray-100">
+                {/* Legal Checkboxes */}
+                <div className="space-y-4 pt-4 border-t border-gray-100">
+                    <label className="flex items-start gap-3 cursor-pointer group">
+                        <input 
+                            type="checkbox" 
+                            checked={agreedPrivacy}
+                            onChange={(e) => setAgreedPrivacy(e.target.checked)}
+                            className="mt-1 w-5 h-5 rounded border-gray-300 text-lanGreen focus:ring-lanGreen"
+                        />
+                        <span className="text-sm text-gray-600 group-hover:text-gray-800 transition-colors">
+                            Я согласен с <button type="button" onClick={() => openLegal('privacy')} className="text-lanBlue underline hover:text-lanGreen font-medium">политикой конфиденциальности</button>
+                        </span>
+                    </label>
+                    <label className="flex items-start gap-3 cursor-pointer group">
+                        <input 
+                            type="checkbox" 
+                            checked={agreedData}
+                            onChange={(e) => setAgreedData(e.target.checked)}
+                            className="mt-1 w-5 h-5 rounded border-gray-300 text-lanGreen focus:ring-lanGreen"
+                        />
+                        <span className="text-sm text-gray-600 group-hover:text-gray-800 transition-colors">
+                            Я даю <button type="button" onClick={() => openLegal('consent')} className="text-lanBlue underline hover:text-lanGreen font-medium">согласие на обработку персональных данных</button>
+                        </span>
+                    </label>
+                </div>
+
+                <div className="pt-4">
                     <button 
                         type="submit" 
-                        disabled={formStatus === 'submitting'}
-                        className="w-full bg-lanGreen hover:bg-green-600 text-white font-bold py-4 rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-70 flex justify-center items-center gap-3 text-lg"
+                        disabled={formStatus === 'submitting' || !agreedPrivacy || !agreedData}
+                        className="w-full bg-lanGreen hover:bg-green-600 text-white font-bold py-4 rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-3 text-lg"
                     >
                         {formStatus === 'submitting' ? (
                             <>
@@ -277,15 +285,12 @@ const Contact: React.FC = () => {
                             'Отправить заявку'
                         )}
                     </button>
-                    <p className="text-center text-xs text-gray-400 mt-4">
-                        Нажимая на кнопку, вы соглашаетесь с <a href="#" className="underline hover:text-gray-600">политикой конфиденциальности</a>
-                    </p>
                 </div>
 
                 {formStatus === 'error' && (
-                    <div className="flex items-start gap-3 text-red-600 text-sm bg-red-50 p-4 rounded-xl border border-red-100 animate-shake">
+                    <div className="flex items-start gap-3 text-red-600 text-sm bg-red-50 p-4 rounded-xl border border-red-100">
                         <AlertCircle size={20} className="flex-shrink-0" />
-                        <span>{errorMessage || 'Ошибка отправки. Пожалуйста, проверьте соединение и попробуйте снова.'}</span>
+                        <span>{errorMessage}</span>
                     </div>
                 )}
             </form>
@@ -297,6 +302,12 @@ const Contact: React.FC = () => {
             </p>
         </div>
       </div>
+
+      <LegalModal 
+        isOpen={legalModal.isOpen} 
+        type={legalModal.type} 
+        onClose={() => setLegalModal(prev => ({ ...prev, isOpen: false }))} 
+      />
     </div>
   );
 };

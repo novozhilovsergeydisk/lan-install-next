@@ -1,9 +1,20 @@
 
-import React from 'react';
+"use client";
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { MapPin, Phone, Mail } from 'lucide-react';
+import LegalModal from './LegalModal';
 
 const Footer: React.FC = () => {
+  const [legalModal, setLegalModal] = useState<{ isOpen: boolean; type: 'privacy' | 'consent' }>({
+    isOpen: false,
+    type: 'privacy'
+  });
+
+  const openLegal = (type: 'privacy' | 'consent') => {
+    setLegalModal({ isOpen: true, type });
+  };
+
   return (
     <footer className="bg-slate-900 text-gray-300 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -37,7 +48,6 @@ const Footer: React.FC = () => {
               <li className="flex items-start gap-3 justify-center md:justify-start">
                 <MapPin className="text-lanGreen flex-shrink-0 mt-0.5" size={18} />
                 <div className="flex flex-col items-center md:items-start">
-                  {/* Ссылка для десктопа (открывает сайт) */}
                   <a 
                     href="https://yandex.ru/maps/?text=г.+Москва,+ул.+7-я+Текстильщиков,+д.+18/15" 
                     target="_blank" 
@@ -46,7 +56,6 @@ const Footer: React.FC = () => {
                   >
                     г. Москва, ул. 7-я Текстильщиков, д. 18/15
                   </a>
-                  {/* Ссылка для мобильных (открывает Навигатор) */}
                   <a 
                     href="yandexnavi://search?text=г. Москва, ул. 7-я Текстильщиков, д. 18/15"
                     className="md:hidden hover:text-white transition leading-relaxed"
@@ -66,14 +75,20 @@ const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* 4. Services (Fourth Column) */}
+          {/* 4. Services & Legal (Fourth Column) */}
           <div className="text-center md:text-left">
-             <h3 className="text-white text-lg font-bold mb-6">Услуги</h3>
+             <h3 className="text-white text-lg font-bold mb-6">Услуги и информация</h3>
              <ul className="space-y-3 text-sm">
                 <li><Link href="/calculator#SCS" className="hover:text-lanGreen transition block py-1">Монтаж СКС</Link></li>
                 <li><Link href="/calculator#Video" className="hover:text-lanGreen transition block py-1">Видеонаблюдение</Link></li>
                 <li><Link href="/calculator#Fiber" className="hover:text-lanGreen transition block py-1">Сварка оптоволокна</Link></li>
                 <li><Link href="/calculator#Access" className="hover:text-lanGreen transition block py-1">СКУД</Link></li>
+                <li className="pt-4 border-t border-gray-800 mt-4">
+                  <button onClick={() => openLegal('privacy')} className="text-xs text-gray-500 hover:text-white transition block py-1">Политика конфиденциальности</button>
+                </li>
+                <li>
+                  <button onClick={() => openLegal('consent')} className="text-xs text-gray-500 hover:text-white transition block py-1">Согласие на обработку данных</button>
+                </li>
              </ul>
           </div>
         </div>
@@ -83,6 +98,12 @@ const Footer: React.FC = () => {
           <p className="text-xs text-gray-400">© {new Date().getFullYear()}, Lan-install. Все права защищены.</p>
         </div>
       </div>
+
+      <LegalModal 
+        isOpen={legalModal.isOpen} 
+        type={legalModal.type} 
+        onClose={() => setLegalModal(prev => ({ ...prev, isOpen: false }))} 
+      />
     </footer>
   );
 };

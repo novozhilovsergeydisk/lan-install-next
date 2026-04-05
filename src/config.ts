@@ -1,10 +1,10 @@
 
 const config = {
-  // Telegram Bot Token
-  TG_BOT_TOKEN: "8525859520:AAEUjLrVL5gtF4DrMVvBbZ-VMkh7k1wKI58",
+  // Telegram Bot Token (Берется из .env.local)
+  TG_BOT_TOKEN: process.env.TG_BOT_TOKEN || "",
   
-  // Telegram Chat ID
-  TG_CHAT_ID: "-1003214449532",
+  // Telegram Chat ID (Берется из .env.local)
+  TG_CHAT_ID: process.env.TG_CHAT_ID || "",
 };
 
 export default config;
