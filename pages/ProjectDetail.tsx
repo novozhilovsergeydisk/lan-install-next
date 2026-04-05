@@ -41,7 +41,7 @@ const ProjectDetail: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Description Card */}
-            <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
+            <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100">
                 <h2 className="text-2xl font-bold text-lanBlue mb-4">О проекте</h2>
                 <p className="text-gray-600 leading-relaxed text-lg">
                     {project.fullDescription}
@@ -49,7 +49,7 @@ const ProjectDetail: React.FC = () => {
             </div>
 
             {/* Scope of Work */}
-            <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
+            <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100">
                 <h3 className="text-xl font-bold text-gray-800 mb-6">Выполненные работы</h3>
                 <ul className="space-y-4">
                     {project.tasks.map((task, index) => (
@@ -63,7 +63,7 @@ const ProjectDetail: React.FC = () => {
 
             {/* Gallery */}
             <div>
-                <h3 className="text-xl font-bold text-gray-800 mb-6">Фотоотчет</h3>
+                <h3 className="text-2xl font-bold text-gray-800 mb-6 pl-2 border-l-4 border-lanGreen flex items-center gap-3">Фотоотчет с объекта</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {project.gallery.map((img, index) => (
                         <div key={index} className="rounded-lg overflow-hidden h-64 shadow-sm group">
