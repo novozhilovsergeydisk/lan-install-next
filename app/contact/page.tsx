@@ -1,7 +1,7 @@
 
 "use client";
-import React, { useState, useEffect } from 'react';
-import { Mail, Phone, CheckCircle, AlertCircle, Settings, Paperclip, X, FileText } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Mail, Phone, CheckCircle, AlertCircle, Settings, Paperclip, X, FileText, Loader2 } from 'lucide-react';
 import config from '../../src/config';
 
 const Contact: React.FC = () => {
@@ -42,10 +42,10 @@ const Contact: React.FC = () => {
     setFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Генерация URL для Telegram (ПРЯМАЯ)
-  const getApiUrl = (method: string) => {
+  // Генерация URL для Telegram
+  const getApiUrl = useCallback((method: string) => {
       return `https://api.telegram.org/bot${TG_BOT_TOKEN}/${method}`;
-  };
+  }, [TG_BOT_TOKEN]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,34 +91,24 @@ const Contact: React.FC = () => {
 
       if (!response.ok) {
          const errText = await response.text();
-         console.error("Telegram Error:", errText);
-         throw new Error(`Telegram Error: ${response.status} ${errText}`);
+         throw new Error(`Telegram Error: ${response.status}`);
       }
 
-      const data = await response.json();
-      if (!data.ok) {
-         throw new Error(data.description || 'Ошибка API Telegram');
-      }
-
-      // 2. Отправка файлов (если есть)
+      // 2. Отправка файлов
       if (files.length > 0) {
          const docUrl = getApiUrl('sendDocument');
          
          for (let i = 0; i < files.length; i++) {
-             setUploadProgress(`Загрузка файлов: ${i + 1} из ${files.length}...`);
+             setUploadProgress(`Загрузка: ${i + 1}/${files.length}`);
              
              const formDataFile = new FormData();
              formDataFile.append('chat_id', TG_CHAT_ID);
              formDataFile.append('document', files[i]);
              
-             const fileResponse = await fetch(docUrl, {
+             await fetch(docUrl, {
                  method: 'POST',
                  body: formDataFile
              });
-             
-             if (!fileResponse.ok) {
-                 console.error(`Failed to upload file ${files[i].name}`);
-             }
          }
       }
 
@@ -129,13 +119,7 @@ const Contact: React.FC = () => {
 
     } catch (error: any) {
       console.error('Submission Error:', error);
-      
-      let userFriendlyError = `Ошибка: ${error.message}`;
-      if (error.message.includes('Unauthorized')) userFriendlyError = 'Ошибка доступа: Неверный токен бота.';
-      if (error.message.includes('Chat not found')) userFriendlyError = 'Ошибка: Чат не найден (проверьте Chat ID).';
-      if (error.message.includes('Failed to fetch')) userFriendlyError = 'Ошибка сети (возможно, блокировка CORS или Интернета).';
-      
-      setErrorMessage(userFriendlyError);
+      setErrorMessage(error.message || 'Ошибка сети');
       setFormStatus('error');
     }
   };
@@ -143,14 +127,14 @@ const Contact: React.FC = () => {
   if (formStatus === 'success') {
     return (
       <div className="min-h-[60vh] flex items-center justify-center bg-gray-50 p-4">
-        <div className="bg-white p-10 rounded-2xl shadow-xl text-center max-w-md">
+        <div className="bg-white p-10 rounded-2xl shadow-xl text-center max-w-md border border-gray-100">
           <div className="w-20 h-20 bg-green-100 text-lanGreen rounded-full flex items-center justify-center mx-auto mb-6">
              <CheckCircle size={40} />
           </div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Спасибо за заявку!</h2>
-          <p className="text-gray-600 mb-6">Наш менеджер свяжется с вами в течение 15 минут для уточнения деталей.</p>
-          <button onClick={() => setFormStatus('idle')} className="text-lanBlue font-medium hover:underline">
-            Отправить еще одну
+          <p className="text-gray-600 mb-6">Наш менеджер свяжется с вами в ближайшее время для уточнения деталей.</p>
+          <button onClick={() => setFormStatus('idle')} className="bg-lanBlue text-white px-6 py-2 rounded-full font-medium hover:bg-blue-900 transition">
+            Вернуться назад
           </button>
         </div>
       </div>
@@ -158,86 +142,85 @@ const Contact: React.FC = () => {
   }
 
   return (
-    <div className="py-16 bg-gray-50">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 bg-white rounded-2xl shadow-lg overflow-hidden">
-           
-           <div className="bg-lanBlue p-10 text-white flex flex-col justify-between">
-              <div>
-                  <h2 className="text-3xl font-bold mb-6">Давайте обсудим ваш проект</h2>
-                  <p className="text-gray-300 mb-10 text-lg">
-                      Оставьте заявку, и мы подготовим для вас коммерческое предложение с точными сроками и ценами.
-                  </p>
-                  
-                  <div className="space-y-6">
-                      <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
-                              <Phone size={24} />
-                          </div>
-                          <div>
-                              <p className="text-sm text-gray-400">Телефон</p>
-                              <p className="text-lg font-semibold">+7 (995) 921-02-09</p>
-                          </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
-                              <Mail size={24} />
-                          </div>
-                          <div>
-                              <p className="text-sm text-gray-400">Email</p>
-                              <p className="text-lg font-semibold">info@lan-install.ru</p>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              <div className="mt-10 md:mt-0">
-                 <p className="text-sm text-gray-400 opacity-60">
-                     ООО "Лан-Инсталл" <br/>
-                     ИНН 7700000000
-                 </p>
-              </div>
-           </div>
+    <div className="py-16 bg-gray-50 min-h-screen">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        
+        {/* Top Info Block (Horizontal) */}
+        <div className="bg-lanBlue rounded-2xl shadow-lg p-8 md:p-12 text-white overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+            <div className="relative z-10">
+                <h1 className="text-3xl md:text-4xl font-bold mb-4">Давайте обсудим ваш проект</h1>
+                <p className="text-white/70 text-lg mb-10 max-w-2xl">
+                    Оставьте заявку, и мы подготовим для вас коммерческое предложение с точными сроками и ценами.
+                </p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-lanGreen">
+                            <Phone size={24} />
+                        </div>
+                        <div>
+                            <p className="text-xs uppercase tracking-wider text-white/50 mb-1">Телефон</p>
+                            <a href="tel:+79959210209" className="text-lg font-bold hover:text-lanGreen transition">+7 (995) 921-02-09</a>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-lanGreen">
+                            <Mail size={24} />
+                        </div>
+                        <div>
+                            <p className="text-xs uppercase tracking-wider text-white/50 mb-1">Email</p>
+                            <a href="mailto:info@lan-install.ru" className="text-lg font-bold hover:text-lanGreen transition">info@lan-install.ru</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-           <div className="p-10">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Ваше имя</label>
-                    <input 
-                      type="text" 
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required 
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-lanGreen focus:border-transparent outline-none transition" 
-                      placeholder="Иван Иванов" 
-                    />
-                 </div>
-                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Телефон</label>
-                    <input 
-                      type="tel" 
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      required 
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-lanGreen focus:border-transparent outline-none transition" 
-                      placeholder="+7 (___) ___-__-__" 
-                    />
-                 </div>
-                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Описание задачи</label>
+        {/* Bottom Form Block */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 border border-gray-100">
+            <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Ваше имя</label>
+                        <input 
+                            type="text" 
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required 
+                            className="w-full px-4 py-4 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-lanGreen focus:border-transparent outline-none transition-all" 
+                            placeholder="Как к вам обращаться?" 
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Контактный телефон</label>
+                        <input 
+                            type="tel" 
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            required 
+                            className="w-full px-4 py-4 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-lanGreen focus:border-transparent outline-none transition-all" 
+                            placeholder="+7 (___) ___-__-__" 
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Описание задачи</label>
                     <textarea 
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      rows={4} 
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-lanGreen focus:border-transparent outline-none transition" 
-                      placeholder="Например: нужно установить 4 камеры в офисе..."
+                        name="message"
+                        value={formData.message}
+                        onChange={handleChange}
+                        rows={4} 
+                        className="w-full px-4 py-4 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-lanGreen focus:border-transparent outline-none transition-all resize-none" 
+                        placeholder="Опишите вкратце вашу задачу (например: монтаж СКС на 20 рабочих мест)"
                     ></textarea>
-                 </div>
+                </div>
 
-                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Прикрепить файлы (фото, проекты)</label>
+                <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Прикрепить файлы</label>
                     <div className="relative">
                         <input 
                             type="file" 
@@ -248,64 +231,70 @@ const Contact: React.FC = () => {
                         />
                         <label 
                             htmlFor="file-upload"
-                            className="flex items-center gap-2 w-full px-4 py-3 rounded-lg border border-dashed border-gray-300 text-gray-500 cursor-pointer hover:bg-gray-50 hover:border-lanGreen transition"
+                            className="flex items-center justify-center gap-3 w-full px-4 py-6 rounded-xl border-2 border-dashed border-gray-200 text-gray-500 cursor-pointer hover:bg-gray-50 hover:border-lanGreen hover:text-lanGreen transition-all"
                         >
-                            <Paperclip size={20} />
-                            <span className="text-sm">Нажмите, чтобы выбрать файлы</span>
+                            <Paperclip size={24} />
+                            <div className="text-center">
+                                <span className="block font-medium">Нажмите, чтобы выбрать файлы</span>
+                                <span className="text-xs text-gray-400">Фотографии объекта, проекты или ТЗ</span>
+                            </div>
                         </label>
                     </div>
 
                     {files.length > 0 && (
-                        <div className="mt-3 space-y-2">
+                        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {files.map((file, index) => (
-                                <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded text-sm">
-                                    <div className="flex items-center gap-2 truncate">
-                                        <FileText size={16} className="text-lanBlue flex-shrink-0" />
-                                        <span className="truncate text-gray-700">{file.name}</span>
+                                <div key={index} className="flex items-center justify-between bg-gray-50 border border-gray-100 px-4 py-3 rounded-xl text-sm">
+                                    <div className="flex items-center gap-3 truncate">
+                                        <FileText size={18} className="text-lanBlue flex-shrink-0" />
+                                        <span className="truncate text-gray-700 font-medium">{file.name}</span>
                                     </div>
                                     <button 
                                         type="button"
                                         onClick={() => removeFile(index)}
-                                        className="text-gray-400 hover:text-red-500 ml-2"
+                                        className="text-gray-400 hover:text-red-500 transition-colors"
                                     >
-                                        <X size={16} />
+                                        <X size={18} />
                                     </button>
                                 </div>
                             ))}
                         </div>
                     )}
-                 </div>
+                </div>
 
-                 {formStatus === 'config_error' && (
-                    <div className="flex items-start gap-2 text-amber-700 text-sm bg-amber-50 p-4 rounded-lg border border-amber-200">
-                        <Settings size={18} className="flex-shrink-0 mt-0.5" />
-                        <div>
-                            <strong>Ошибка настройки!</strong><br/>
-                            Не найдены ключи Telegram. Проверьте файл src/config.ts
-                        </div>
+                <div className="pt-4 border-t border-gray-100">
+                    <button 
+                        type="submit" 
+                        disabled={formStatus === 'submitting'}
+                        className="w-full bg-lanGreen hover:bg-green-600 text-white font-bold py-4 rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-70 flex justify-center items-center gap-3 text-lg"
+                    >
+                        {formStatus === 'submitting' ? (
+                            <>
+                                <Loader2 className="animate-spin" size={24} />
+                                {uploadProgress || 'Отправляем...'}
+                            </>
+                        ) : (
+                            'Отправить заявку'
+                        )}
+                    </button>
+                    <p className="text-center text-xs text-gray-400 mt-4">
+                        Нажимая на кнопку, вы соглашаетесь с <a href="#" className="underline hover:text-gray-600">политикой конфиденциальности</a>
+                    </p>
+                </div>
+
+                {formStatus === 'error' && (
+                    <div className="flex items-start gap-3 text-red-600 text-sm bg-red-50 p-4 rounded-xl border border-red-100 animate-shake">
+                        <AlertCircle size={20} className="flex-shrink-0" />
+                        <span>{errorMessage || 'Ошибка отправки. Пожалуйста, проверьте соединение и попробуйте снова.'}</span>
                     </div>
-                 )}
+                )}
+            </form>
+        </div>
 
-                 {formStatus === 'error' && (
-                    <div className="flex items-start gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-100">
-                        <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
-                        <span>{errorMessage || 'Ошибка отправки. Попробуйте позже.'}</span>
-                    </div>
-                 )}
-
-                 <button 
-                    type="submit" 
-                    disabled={formStatus === 'submitting'}
-                    className="w-full bg-lanGreen hover:bg-green-600 text-white font-bold py-3 rounded-lg transition disabled:opacity-70 flex justify-center items-center gap-2"
-                 >
-                    {formStatus === 'submitting' ? (
-                        <>{uploadProgress || 'Отправка заявки...'}</>
-                    ) : (
-                        'Отправить заявку'
-                    )}
-                 </button>
-              </form>
-           </div>
+        <div className="text-center">
+            <p className="text-sm text-gray-400">
+                ООО "Лан-Инсталл" • ИНН 7700000000
+            </p>
         </div>
       </div>
     </div>
