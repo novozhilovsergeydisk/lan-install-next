@@ -1,8 +1,8 @@
 "use client";
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, MapPin, Calendar, User, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, User, CheckCircle2, X, ChevronLeft, ArrowRight, ChevronRight } from 'lucide-react';
 import { projects } from '../../../src/data/projects';
 
 const ProjectDetail: React.FC = () => {
@@ -10,8 +10,52 @@ const ProjectDetail: React.FC = () => {
   const id = params?.id;
   const router = useRouter();
   
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+
   // Находим проект по ID
   const project = projects.find(p => p.id === Number(id));
+
+  const handlePrev = useCallback(() => {
+    if (project && selectedImageIndex !== null) {
+      setSelectedImageIndex((prev) => 
+        prev === 0 ? project.gallery.length - 1 : prev! - 1
+      );
+    }
+  }, [project, selectedImageIndex]);
+
+  const handleNext = useCallback(() => {
+    if (project && selectedImageIndex !== null) {
+      setSelectedImageIndex((prev) => 
+        prev === project.gallery.length - 1 ? 0 : prev! + 1
+      );
+    }
+  }, [project, selectedImageIndex]);
+
+  const handleClose = useCallback(() => {
+    setSelectedImageIndex(null);
+  }, []);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedImageIndex === null) return;
+      if (e.key === 'Escape') handleClose();
+      if (e.key === 'ArrowLeft') handlePrev();
+      if (e.key === 'ArrowRight') handleNext();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedImageIndex, handleClose, handlePrev, handleNext]);
+
+  // Prevent scroll when lightbox is open
+  useEffect(() => {
+    if (selectedImageIndex !== null) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [selectedImageIndex]);
 
   // Если проект не найден, редирект или ошибка
   if (!project) {
@@ -28,10 +72,11 @@ const ProjectDetail: React.FC = () => {
         <img 
           src={project.mainImage} 
           alt={project.title} 
-          className="w-full h-full object-cover opacity-60 transition-transform duration-[1200ms] ease-[cubic-bezier(0.4,0,0.2,1)] transform group-hover:scale-105 group-hover:duration-[1200ms]"
+          className="w-full h-full object-cover opacity-60 transition-transform duration-[1200ms] ease-[cubic-bezier(0.4,0,0.2,1)] transform group-hover:scale-105 group-hover:duration-[1200ms] cursor-pointer"
+          onClick={() => setSelectedImageIndex(0)}
         />
-        <div className="absolute inset-0 flex flex-col justify-end pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-           <Link href="/portfolio" className="text-white/80 hover:text-white flex items-center gap-2 mb-6 transition w-fit bg-black/20 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-black/40">
+        <div className="absolute inset-0 flex flex-col justify-end pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pointer-events-none">
+           <Link href="/portfolio" className="text-white/80 hover:text-white flex items-center gap-2 mb-6 transition w-fit bg-black/20 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-black/40 pointer-events-auto">
               <ArrowLeft size={18} /> Назад в портфолио
            </Link>
            <div className="inline-block bg-lanGreen text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 w-fit shadow-lg">
@@ -72,7 +117,7 @@ const ProjectDetail: React.FC = () => {
                 <h3 className="text-2xl font-bold text-gray-800 mb-6 pl-2 border-l-4 border-lanGreen flex items-center gap-3">Фотоотчет с объекта</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {project.gallery.map((img, index) => (
-                        <div key={index} className="rounded-lg overflow-hidden h-64 shadow-sm group">
+                        <div key={index} className="rounded-lg overflow-hidden h-64 shadow-sm group cursor-pointer" onClick={() => setSelectedImageIndex(index)}>
                             <img 
                                 src={img} 
                                 alt={`${project.title} фото ${index + 1}`} 
@@ -134,6 +179,49 @@ const ProjectDetail: React.FC = () => {
 
         </div>
       </div>
+
+      {/* Lightbox Modal */}
+      {selectedImageIndex !== null && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm transition-all duration-300">
+          {/* Close Button */}
+          <button 
+            onClick={handleClose}
+            className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors p-2 z-[110]"
+          >
+            <X size={32} />
+          </button>
+
+          {/* Navigation Buttons */}
+          <button 
+            onClick={handlePrev}
+            className="absolute left-4 md:left-10 text-white/50 hover:text-white transition-all p-4 z-[110] hover:bg-white/5 rounded-full"
+          >
+            <ChevronLeft size={48} />
+          </button>
+          
+          <button 
+            onClick={handleNext}
+            className="absolute right-4 md:right-10 text-white/50 hover:text-white transition-all p-4 z-[110] hover:bg-white/5 rounded-full"
+          >
+            <ChevronRight size={48} />
+          </button>
+
+          {/* Image Container */}
+          <div className="relative w-full h-full flex items-center justify-center p-4 md:p-20 select-none" onClick={handleClose}>
+            <img 
+              src={project.gallery[selectedImageIndex]} 
+              alt={`${project.title} - фото ${selectedImageIndex + 1}`}
+              className="max-w-full max-h-full object-contain shadow-2xl transition-transform duration-500"
+              onClick={(e) => e.stopPropagation()} // Prevent close when clicking the image
+            />
+            
+            {/* Image Counter */}
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/70 font-medium bg-black/40 px-4 py-2 rounded-full backdrop-blur-md">
+              {selectedImageIndex + 1} / {project.gallery.length}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
