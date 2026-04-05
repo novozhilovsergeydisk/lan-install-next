@@ -70,10 +70,10 @@ const Home: React.FC = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link to="/contact" className="bg-lanGreen hover:bg-green-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition transform hover:-translate-y-1 shadow-lg border border-transparent">
+            <Link to="/contact" className="bg-lanGreen hover:bg-green-500 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all duration-300 hover:shadow-[0_8px_30px_rgb(34,197,94,0.3)] border border-transparent">
               Оставить заявку
             </Link>
-             <Link to="/portfolio" className="bg-transparent hover:bg-white/10 text-white border-2 border-white/50 hover:border-white px-8 py-4 rounded-lg font-bold text-lg transition">
+             <Link to="/portfolio" className="bg-transparent hover:bg-white/10 text-white border-2 border-white/50 hover:border-white px-8 py-4 rounded-lg font-bold text-lg transition-all duration-300">
               Примеры работ
             </Link>
           </div>
@@ -90,7 +90,7 @@ const Home: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <div className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-2 group">
-                <div className="text-lanGreen mb-6 group-hover:scale-110 transition-transform duration-300">
+                <div className="text-lanGreen mb-6">
                   <Network size={48} />
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 mb-3">Монтаж СКС</h3>
@@ -103,7 +103,7 @@ const Home: React.FC = () => {
               </div>
 
               <div className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-2 group">
-                <div className="text-lanGreen mb-6 group-hover:scale-110 transition-transform duration-300">
+                <div className="text-lanGreen mb-6">
                   <ShieldCheck size={48} />
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 mb-3">Видеонаблюдение</h3>
@@ -116,7 +116,7 @@ const Home: React.FC = () => {
               </div>
 
               <div className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-2 group">
-                <div className="text-lanGreen mb-6 group-hover:scale-110 transition-transform duration-300">
+                <div className="text-lanGreen mb-6">
                   <Zap size={48} />
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 mb-3">Оптоволокно (ВОЛС)</h3>
@@ -129,7 +129,7 @@ const Home: React.FC = () => {
               </div>
 
               <div className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-2 group">
-                <div className="text-lanGreen mb-6 group-hover:scale-110 transition-transform duration-300">
+                <div className="text-lanGreen mb-6">
                   <HardDrive size={48} />
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 mb-3">Контроль доступа</h3>
