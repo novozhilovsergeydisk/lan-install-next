@@ -1,0 +1,17 @@
+[Unit]
+Description=Lan Install Next.js App
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/lan-install.ru
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=PATH=/opt/node-20/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart=/opt/node-20/bin/node /var/www/lan-install.ru/node_modules/next/dist/bin/next start
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
