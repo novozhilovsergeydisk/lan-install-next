@@ -270,7 +270,7 @@ const Calculator: React.FC = () => {
                                 ))}
                                 </Pie>
                                 <Tooltip 
-                                    contentStyle={{ backgroundColor: 'rgba(31, 58, 90, 0.9)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backdropBlur: '8px' }}
+                                    contentStyle={{ backgroundColor: 'rgba(31, 58, 90, 0.9)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(8px)' }}
                                     itemStyle={{ color: '#fff', fontSize: '12px' }}
                                     formatter={(value: number) => [`${value.toLocaleString('ru-RU')} ₽`, '']}
                                 />
