@@ -1,8 +1,9 @@
-
 import { NextResponse } from 'next/server';
 import config from '../../../src/config';
 import fs from 'fs/promises';
 import path from 'path';
+import axios from 'axios';
+import { SocksProxyAgent } from 'socks-proxy-agent';
 
 export async function POST(request: Request) {
   try {
@@ -44,40 +45,45 @@ export async function POST(request: Request) {
 📎 <b>Файлов прикреплено:</b> ${files.length}
     `;
 
+    // Создаем агент для SOCKS5 прокси (используем локальный туннель)
+    const agent = new SocksProxyAgent('socks5://127.0.0.1:1080');
+
     // 1. Отправляем текст
-    const textResponse = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    await axios.post(
+      `https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`,
+      {
         chat_id: TG_CHAT_ID,
         text: text,
         parse_mode: 'HTML',
-      }),
-    });
-
-    if (!textResponse.ok) {
-      const err = await textResponse.text();
-      return NextResponse.json({ error: `Telegram Error: ${err}` }, { status: 500 });
-    }
+      },
+      { httpsAgent: agent }
+    );
 
     // 2. Отправляем файлы (если есть)
     if (files.length > 0) {
       for (const file of files) {
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        
         const fileFormData = new FormData();
         fileFormData.append('chat_id', TG_CHAT_ID);
-        fileFormData.append('document', file);
+        fileFormData.append('document', new Blob([buffer], { type: file.type }), file.name);
 
-        await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendDocument`, {
-          method: 'POST',
-          body: fileFormData,
-        });
+        await axios.post(
+          `https://api.telegram.org/bot${TG_BOT_TOKEN}/sendDocument`,
+          fileFormData,
+          { 
+            httpsAgent: agent,
+            // Заголовки multipart/form-data axios проставит автоматически на основе объекта FormData
+          }
+        );
       }
     }
 
     return NextResponse.json({ success: true });
 
   } catch (error: any) {
-    console.error('API Route Error:', error);
+    console.error('API Route Error:', error?.response?.data || error.message);
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }
