@@ -3,8 +3,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { CalculatorItem } from '../../types';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
-import { Save, RefreshCw, AlertTriangle, FileSpreadsheet } from 'lucide-react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { Save, RefreshCw, AlertTriangle, FileSpreadsheet, Plus, Minus } from 'lucide-react';
 
 const initialItems: CalculatorItem[] = [
   // SCS (Структурированные кабельные сети)
@@ -63,7 +63,7 @@ const initialItems: CalculatorItem[] = [
   { id: 'fiber_test', name: 'Рефлектометрия (тестирование линии)', price: 300, unit: 'волокно', category: 'Fiber', qty: 0 },
 ];
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+const COLORS = ['#3ab54a', '#1f3a5a', '#f39c12', '#0088FE'];
 
 const Calculator: React.FC = () => {
   const [items, setItems] = useState<CalculatorItem[]>(initialItems);
@@ -78,9 +78,6 @@ const Calculator: React.FC = () => {
       const id = hash.replace('#', '');
       const element = document.getElementById(id);
       if (element) {
-        // Adding a small delay ensures DOM is fully ready, 
-        // though React usually handles this well. 
-        // Using timeout to ensure scroll happens after render
         setTimeout(() => {
             element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 100);
@@ -113,18 +110,16 @@ const Calculator: React.FC = () => {
   const handleReset = () => setItems(initialItems);
 
   const categories = [
-      { key: 'SCS', label: 'Структурированные сети (СКС)' },
-      { key: 'Video', label: 'Видеонаблюдение' },
+      { key: 'SCS', label: 'Структурированные кабельные сети (СКС)' },
+      { key: 'Video', label: 'Системы видеонаблюдения' },
       { key: 'Access', label: 'Контроль доступа (СКУД)' },
-      { key: 'Fiber', label: 'Оптоволокно (ВОЛС)' },
+      { key: 'Fiber', label: 'Оптоволоконные линии (ВОЛС)' },
   ];
 
-  // Функция экспорта в CSV (открывается в Excel)
   const handleExportCSV = () => {
     const selectedItems = items.filter(i => i.qty > 0);
     if (selectedItems.length === 0) return;
 
-    // BOM для корректного отображения кириллицы в Excel
     let csvContent = "\uFEFF";
     csvContent += "Категория;Наименование;Цена (руб.);Кол-во;Ед.изм.;Сумма (руб.)\n";
 
@@ -138,7 +133,6 @@ const Calculator: React.FC = () => {
     selectedItems.forEach(item => {
         const cat = categoryMap[item.category] || item.category;
         const sum = item.price * item.qty;
-        // Экранируем точку с запятой в названиях, если вдруг встретится
         const name = item.name.replace(/;/g, ',');
         csvContent += `${cat};${name};${item.price};${item.qty};${item.unit};${sum}\n`;
     });
@@ -156,150 +150,175 @@ const Calculator: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-lanBlue mb-4">Калькулятор стоимости монтажа</h1>
-          <p className="text-gray-600 max-w-3xl mx-auto">
-            Выберите необходимые работы и оборудование для предварительной оценки.
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-5xl font-bold text-lanBlue mb-6">Калькулятор стоимости</h1>
+          <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+            Сформируйте предварительную смету вашего проекта онлайн. Выберите необходимые работы и оборудование.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
           {/* Input Section */}
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-800">Параметры проекта</h2>
-              <button onClick={handleReset} className="text-gray-500 hover:text-lanOrange flex items-center gap-1 text-sm">
-                <RefreshCw size={16} /> Сбросить
-              </button>
-            </div>
-            
-            <div className="space-y-8">
-               {categories.map(cat => (
-                 <div key={cat.key} id={cat.key} className="scroll-mt-28">
-                   <h3 className="text-lg font-semibold text-lanBlue border-b border-gray-100 pb-2 mb-4">
-                     {cat.label}
-                   </h3>
-                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                     {items.filter(i => i.category === cat.key).map(item => {
-                       // Определяем шаг: если метры, то 100, иначе 1
-                       const step = item.unit === 'м' ? 100 : 1;
-                       
-                       return (
-                         <div key={item.id} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-transparent hover:border-gray-200 transition-colors">
-                           <div className="flex-1 pr-2">
-                              <div className="text-sm font-medium text-gray-700 leading-tight mb-1">{item.name}</div>
-                              <div className="text-xs text-gray-500">{item.price} ₽ / {item.unit}</div>
-                           </div>
-                           <div className="flex items-center gap-2">
-                              <button 
-                                  onClick={() => handleQtyChange(item.id, Math.max(0, item.qty - step))}
-                                  className="w-8 h-8 rounded-full bg-white border border-gray-300 text-gray-600 flex items-center justify-center hover:bg-gray-100 hover:text-lanOrange transition"
-                                  aria-label="Уменьшить количество"
-                              >-</button>
-                              <input 
-                                  type="number" 
-                                  value={item.qty === 0 ? '' : item.qty}
-                                  placeholder="0"
-                                  onChange={(e) => {
-                                      const val = e.target.value === '' ? 0 : parseInt(e.target.value);
-                                      handleQtyChange(item.id, isNaN(val) ? 0 : val);
-                                  }}
-                                  onFocus={(e) => e.target.select()}
-                                  className="w-14 text-center bg-transparent font-bold border-b border-gray-300 focus:outline-none focus:border-lanGreen"
-                              />
-                              <button 
-                                  onClick={() => handleQtyChange(item.id, item.qty + step)}
-                                  className="w-8 h-8 rounded-full bg-white border border-gray-300 text-gray-600 flex items-center justify-center hover:bg-gray-100 hover:text-lanGreen transition"
-                                  aria-label="Увеличить количество"
-                              >+</button>
-                           </div>
-                         </div>
-                       );
-                     })}
-                   </div>
-                 </div>
-               ))}
-            </div>
+          <div className="lg:col-span-2 space-y-10">
+            {categories.map(cat => (
+              <div key={cat.key} id={cat.key} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden scroll-mt-28 transition-all duration-500 hover:shadow-md">
+                <div className="bg-gray-50/50 px-8 py-5 border-b border-gray-100 flex justify-between items-center">
+                  <h3 className="text-xl font-bold text-lanBlue">{cat.label}</h3>
+                  {items.some(i => i.category === cat.key && i.qty > 0) && (
+                    <span className="bg-lanGreen/10 text-lanGreen text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider animate-pulse">Активно</span>
+                  )}
+                </div>
+                <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {items.filter(i => i.category === cat.key).map(item => {
+                    const step = item.unit === 'м' ? 100 : 1;
+                    return (
+                      <div key={item.id} className="group relative bg-white p-4 rounded-xl border border-gray-100 transition-all duration-500 hover:border-lanGreen/30 hover:shadow-lg hover:-translate-y-0.5 flex flex-col justify-between min-h-[100px]">
+                        <div className="mb-4">
+                          <div className="text-sm font-bold text-gray-800 mb-1 leading-tight group-hover:text-lanBlue transition-colors">{item.name}</div>
+                          <div className="text-xs font-medium text-gray-400 uppercase tracking-tighter">{item.price} ₽ / {item.unit}</div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between mt-auto">
+                          <div className="flex items-center bg-gray-50 rounded-full p-1 border border-gray-100 group-hover:border-gray-200 transition-colors">
+                            <button 
+                                onClick={() => handleQtyChange(item.id, Math.max(0, item.qty - step))}
+                                className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 hover:text-lanOrange hover:shadow transition-all"
+                                aria-label="Уменьшить"
+                            >
+                              <Minus size={14} />
+                            </button>
+                            <input 
+                                type="number" 
+                                value={item.qty === 0 ? '' : item.qty}
+                                placeholder="0"
+                                onChange={(e) => {
+                                    const val = e.target.value === '' ? 0 : parseInt(e.target.value);
+                                    handleQtyChange(item.id, isNaN(val) ? 0 : val);
+                                }}
+                                onFocus={(e) => e.target.select()}
+                                className="w-12 text-center bg-transparent font-bold text-lanBlue focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            />
+                            <button 
+                                onClick={() => handleQtyChange(item.id, item.qty + step)}
+                                className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 hover:text-lanGreen hover:shadow transition-all"
+                                aria-label="Увеличить"
+                            >
+                              <Plus size={14} />
+                            </button>
+                          </div>
+                          {item.qty > 0 && (
+                            <div className="text-sm font-bold text-lanGreen animate-in fade-in zoom-in duration-300">
+                              {(item.price * item.qty).toLocaleString('ru-RU')} ₽
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Result Section */}
-          <div className="lg:col-span-1 space-y-6">
-             {/* Summary Card */}
-             <div className="bg-lanBlue text-white rounded-xl shadow-lg p-6 sticky top-24">
-                <h3 className="text-lg font-semibold mb-4 opacity-90">Итоговая стоимость</h3>
-                <div className="text-4xl font-bold mb-6">
-                  {totalCost.toLocaleString('ru-RU')} ₽
-                </div>
+          <div className="lg:col-span-1 sticky top-24">
+             <div className="bg-lanBlue rounded-3xl shadow-2xl p-8 text-white relative overflow-hidden">
+                {/* Decorative Elements */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-lanGreen/20 rounded-full -ml-16 -mb-16 blur-2xl"></div>
                 
-                {/* Warning Block */}
-                <div className="bg-white/10 border border-white/20 rounded-lg p-4 mb-6 text-sm backdrop-blur-sm">
-                    <div className="flex gap-3 items-start">
-                        <AlertTriangle className="text-yellow-300 flex-shrink-0 mt-0.5" size={20} />
-                        <p className="text-gray-100 text-xs leading-relaxed">
-                            <strong className="text-white block mb-1">Цены ориентировочные</strong>
-                            Итоговая стоимость может быть <span className="text-yellow-300 font-bold">меньше</span> (скидки за объем) или <span className="text-yellow-300 font-bold">больше</span> (сложность монтажа).
-                            <span className="block mt-2 pt-2 border-t border-white/10">
-                                Для точного расчета нужен осмотр объекта или ознакомление с проектом. Оставьте заявку.
-                            </span>
-                        </p>
-                    </div>
-                </div>
-
-                {totalCost > 0 ? (
-                  <div className="h-48 mb-6">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={categoryData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={40}
-                          outerRadius={60}
-                          fill="#8884d8"
-                          paddingAngle={5}
-                          dataKey="value"
-                        >
-                          {categoryData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip 
-                            contentStyle={{ backgroundColor: '#333', borderRadius: '8px', border: 'none', color: '#fff' }}
-                            itemStyle={{ color: '#fff' }}
-                            formatter={(value: number) => [`${value} ₽`, '']}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="flex justify-center gap-2 flex-wrap text-xs">
-                        {categoryData.map((entry, index) => (
-                            <div key={index} className="flex items-center gap-1">
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
-                                {entry.name}
-                            </div>
-                        ))}
-                    </div>
-                  </div>
-                ) : (
-                   <div className="h-48 flex items-center justify-center text-white/30 border-2 border-dashed border-white/10 rounded-lg mb-6">
-                       Нет данных для графика
-                   </div>
-                )}
-
-                <div className="space-y-3">
-                    <Link href="/contact" className="w-full bg-lanGreen hover:bg-green-600 text-white font-bold py-3 rounded-lg transition flex items-center justify-center gap-2">
-                        <Save size={18} /> Отправить заявку
-                    </Link>
-                    
-                    {totalCost > 0 && (
-                        <button 
-                            onClick={handleExportCSV}
-                            className="w-full bg-white/10 hover:bg-white/20 text-white font-medium py-3 rounded-lg transition flex items-center justify-center gap-2 border border-white/30"
-                        >
-                            <FileSpreadsheet size={18} /> Сохранить смету
+                <div className="relative z-10 flex flex-col h-full">
+                    <div className="flex items-center justify-between mb-8">
+                        <h3 className="text-lg font-medium text-white/70">Предварительный итог</h3>
+                        <button onClick={handleReset} className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors group" title="Сбросить всё">
+                            <RefreshCw size={18} className="group-active:rotate-180 transition-transform duration-500" />
                         </button>
+                    </div>
+
+                    <div className="mb-10">
+                        <div className="text-5xl font-black mb-2 tracking-tight">
+                            {totalCost.toLocaleString('ru-RU')} <span className="text-2xl font-normal opacity-60">₽</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                            <div 
+                                className="h-full bg-lanGreen transition-all duration-1000 ease-out"
+                                style={{ width: totalCost > 0 ? '100%' : '0%' }}
+                            ></div>
+                        </div>
+                    </div>
+                    
+                    {totalCost > 0 ? (
+                      <div className="mb-10">
+                        <div className="h-48">
+                            <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                data={categoryData}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={50}
+                                outerRadius={75}
+                                fill="#8884d8"
+                                paddingAngle={8}
+                                dataKey="value"
+                                stroke="none"
+                                >
+                                {categoryData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                                </Pie>
+                                <Tooltip 
+                                    contentStyle={{ backgroundColor: 'rgba(31, 58, 90, 0.9)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backdropBlur: '8px' }}
+                                    itemStyle={{ color: '#fff', fontSize: '12px' }}
+                                    formatter={(value: number) => [`${value.toLocaleString('ru-RU')} ₽`, '']}
+                                />
+                            </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div className="flex flex-wrap justify-center gap-3 mt-4">
+                            {categoryData.map((entry, index) => (
+                                <div key={index} className="flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border border-white/5">
+                                    <div className="w-2 h-2 rounded-full shadow-sm" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
+                                    {entry.name}
+                                </div>
+                            ))}
+                        </div>
+                      </div>
+                    ) : (
+                       <div className="h-48 flex flex-col items-center justify-center text-white/20 border-2 border-dashed border-white/10 rounded-2xl mb-10 group">
+                           <FileSpreadsheet size={40} className="mb-2 opacity-50 group-hover:scale-110 transition-transform" />
+                           <span className="text-sm font-medium">Выберите услуги</span>
+                       </div>
                     )}
+
+                    <div className="bg-white/10 border border-white/10 rounded-2xl p-5 mb-10 backdrop-blur-md">
+                        <div className="flex gap-3 items-start">
+                            <AlertTriangle className="text-lanGreen flex-shrink-0" size={20} />
+                            <p className="text-white/80 text-[11px] leading-relaxed">
+                                Расчет носит справочный характер. Финальная стоимость зависит от сложности монтажа и объема работ.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-4 mt-auto">
+                        <Link 
+                            href="/contact" 
+                            className="w-full bg-lanGreen hover:bg-green-500 text-white font-bold py-4 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-[0_8px_30px_rgb(34,197,94,0.4)] flex items-center justify-center gap-3 text-lg"
+                        >
+                            <Save size={20} /> Обсудить проект
+                        </Link>
+                        
+                        {totalCost > 0 && (
+                            <button 
+                                onClick={handleExportCSV}
+                                className="w-full bg-white/5 hover:bg-white/10 text-white font-semibold py-3 rounded-2xl transition-all flex items-center justify-center gap-2 border border-white/10 hover:border-white/20 text-sm"
+                            >
+                                <FileSpreadsheet size={18} /> Скачать смету (CSV)
+                            </button>
+                        )}
+                    </div>
                 </div>
              </div>
           </div>
